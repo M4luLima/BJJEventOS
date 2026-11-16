@@ -1,60 +1,126 @@
-# EventOS — API REST para Gerenciamento de Eventos e Festivais
+# BJJEventOS — API REST para Gerenciamento de Campeonatos de Jiu-Jitsu
 
-API desenvolvida em **FastAPI** e **PostgreSQL** para centralizar o ciclo de vida de eventos, incluindo cadastro de usuários, gestão de eventos, programação de atividades, vendas de ingressos e inscrições com controle de capacidade e segurança via JWT.
-
-##  Tecnologias Utilizadas
-
-* **Python 3.12**
-* **FastAPI** — Framework web assíncrono RESTful
-* **SQLAlchemy 2.0** — ORM para mapeamento objeto-relacional
-* **Alembic** — Migrações e controle de versão do banco
-* **Pydantic v2** — Validação rigorosa de tipos e schemas
-* **PyJWT / Passlib (bcrypt)** — Autenticação e segurança de senhas
-* **Pytest** — Testes automatizados de integração e regras de negócio
+Plataforma RESTful especializada na gestão de torneios de Jiu-Jitsu (padrão IBJJF/CBJJ), desenvolvida por **Maria Luiza** em **Python 3.15**, **FastAPI**, **SQLAlchemy** e **PostgreSQL / SQLite**.
 
 ---
 
-##  Estrutura do Projeto
+## 🥋 Perfis de Acesso (RBAC)
 
-```text
-eventos-api/
+- **Admin:** Controle global do sistema, credenciamento de organizadores e exclusão de eventos.
+- **Organizador:** Cadastro de torneios, definição de tatames, encerramento da checagem, geração de chaves e lançamento de placares.
+- **Atleta:** Ficha biométrica (Faixa, Peso, Idade, Academia), inscrição por categoria (Peso e Absoluto) e acompanhamento de chaves.
+
+---
+
+## ✨ Funcionalidades
+
+- Cadastro e autenticação de usuários com JWT
+- Cadastro de atletas com faixa, peso, idade e academia
+- Criação e gerenciamento de eventos e categorias
+- Inscrição de atletas por categoria (Peso e Absoluto)
+- Geração de chaves de lutas
+- Lançamento de placares e resultados
+- Controle de acesso por perfil (Admin, Organizador, Atleta)
+
+---
+
+## 🛠️ Tecnologias
+
+- Python 3.15
+- FastAPI
+- Uvicorn
+- SQLAlchemy
+- Pydantic / Pydantic Settings
+- Alembic
+- PyJWT
+- Passlib + Bcrypt
+- Python-Multipart
+- Pytest + HTTPX
+- PostgreSQL / SQLite
+
+---
+
+## ⚙️ Instalação e Execução
+
+### 1. Criar e ativar o ambiente virtual
+
+```bash
+py -m venv venv
+.\venv\Scripts\Activate.ps1
+### 2. Instalar as dependências
+py -m pip install -r requirements.txt
+### 3. Configurar as variáveis de ambiente
+copy .env.example .env
+Exemplo do arquivo `.env`:
+DATABASE_URL=sqlite:///./bjjeventos.db
+SECRET_KEY=sua-chave-secreta-aqui
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=60
+> Para usar PostgreSQL, troque o `DATABASE_URL` para:
+> `postgresql://usuario:senha@localhost:5432/bjjeventos`
+
+### 4. Iniciar o servidor
+py -m uvicorn app.main:app --reload
+Servidor rodando em: `http://127.0.0.1:8000`
+
+Documentação Interativa (Swagger): `http://127.0.0.1:8000/docs`
+
+Documentação alternativa (ReDoc): `http://127.0.0.1:8000/redoc`
+
+---
+
+## 📡 Principais Endpoints
+Método | Rota | Descrição
+POST | `/auth/login` | Login e geração do token JWT
+POST | `/auth/register` | Cadastro de novo usuário
+GET | `/usuarios/` | Listar usuários
+GET | `/atletas/` | Listar atletas
+POST | `/atletas/` | Cadastrar atleta
+GET | `/eventos/` | Listar eventos
+POST | `/eventos/` | Criar novo evento
+GET | `/inscricoes/` | Listar inscrições
+POST | `/inscricoes/` | Criar inscrição
+> Veja todas as rotas completas em: `http://127.0.0.1:8000/docs`
+
+---
+
+## 📁 Estrutura do Projeto
+bjjeventos-api/
 ├── app/
-│   ├── main.py              # Ponto de entrada da aplicação FastAPI
-│   ├── database.py          # Configuração da sessão e engine SQLAlchemy
 │   ├── core/
-│   │   ├── config.py        # Configurações globais e variáveis de ambiente
-│   │   ├── security.py      # Funções de Hash de senha e geração JWT
-│   │   └── deps.py          # Injeção de dependências e controle RBAC
-│   ├── models/              # Modelos do Banco de Dados (ORM)
-│   ├── schemas/             # Schemas de Validação (Pydantic)
-│   └── routers/             # Rotas e Endpoints organizados por recurso
-├── alembic/                 # Script de migração de banco de dados
-├── tests/                   # Suíte de testes automatizados com Pytest
-├── .env.example             # Exemplo de arquivo de configuração
-├── requirements.txt         # Dependências do projeto
+│   │   ├── config.py
+│   │   ├── deps.py
+│   │   └── security.py
+│   ├── models/
+│   │   ├── atleta.py
+│   │   ├── categoria.py
+│   │   ├── evento.py
+│   │   ├── inscricao.py
+│   │   ├── luta.py
+│   │   ├── perfil_atleta.py
+│   │   └── usuario.py
+│   ├── routers/
+│   │   ├── atleta.py
+│   │   ├── auth.py
+│   │   ├── eventos.py
+│   │   ├── inscricoes.py
+│   │   └── usuarios.py
+│   ├── schemas/
+│   │   ├── __init__.py
+│   │   └── database.py
+│   └── main.py
+├── tests/
+├── .env.example
+├── requirements.txt
 └── README.md
-```
-
 ---
 
-# Como Executar a Aplicação
-
-## 1. Instalar as dependências
-``bash
-pip install -r requirements.txt
-``
-## 2. Iniciar o Servidor FastAPI
-``bash
-uvicorn app.main:app --reload
-``
-
-* **Swagger UI:** [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
-
+## ✅ Testes
+py -m pytest
+Para ver com mais detalhes:
+py -m pytest -v
 ---
 
+##  Autora
 
-##  Perfis de Acesso (RBAC)
-
-* **Admin:** Acesso irrestrito a todas as rotas e exclusão de eventos (`RN10`).
-* **Organizador:** Pode criar eventos, editar os próprios eventos (`RN09`) e adicionar atividades e ingressos aos seus eventos.
-* **Participante:** Consulta eventos/atividades, realiza inscrições (`RN06`, `RN07`) e cancela a própria inscrição (`RN08`).
+*Maria Luiza* - BJJEventOS
