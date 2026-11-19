@@ -1,9 +1,10 @@
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+
 from app.database import get_db
-from app.models.evento import Evento
 from app.models.usuario import Usuario
+from app.models.evento import Evento
 from app.schemas.evento import EventoCreate, EventoResponse
 from app.core.deps import get_current_user, require_roles
 
@@ -34,3 +35,10 @@ def criar_evento(
     db.commit()
     db.refresh(novo_evento)
     return novo_evento
+
+@router.get("/{evento_id}", response_model=EventoResponse)
+def obter_evento(evento_id: int, db: Session = Depends(get_db)):
+    evento = db.query(Evento).filter(Evento.id == evento_id).first()
+    if not evento:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Campeonato não encontrado")
+    return evento
