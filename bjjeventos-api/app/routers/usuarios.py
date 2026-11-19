@@ -1,6 +1,7 @@
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+
 from app.database import get_db
 from app.models.usuario import Usuario
 from app.schemas.usuario import UsuarioCreate, UsuarioResponse
@@ -11,11 +12,20 @@ router = APIRouter(prefix="/usuarios", tags=["Usuários"])
 
 @router.post("", response_model=UsuarioResponse, status_code=status.HTTP_201_CREATED)
 def criar_usuario(usuario_in: UsuarioCreate, db: Session = Depends(get_db)):
+    # RN01: E-mail único
     user_exists = db.query(Usuario).filter(Usuario.email == usuario_in.email).first()
     if user_exists:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Já existe uma conta cadastrada com este e-mail.")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Já existe uma conta cadastrada com este e-mail."
+        )
+    
     if usuario_in.perfil not in ["admin", "organizador", "atleta"]:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Perfil inválido. Escolha entre admin, organizador ou atleta.")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Perfil de usuário inválido. Escolha entre admin, organizador ou atleta."
+        )
+
     novo_usuario = Usuario(
         nome=usuario_in.nome,
         email=usuario_in.email,
@@ -31,6 +41,10 @@ def criar_usuario(usuario_in: UsuarioCreate, db: Session = Depends(get_db)):
 def consultar_meus_dados(current_user: Usuario = Depends(get_current_user)):
     return current_user
 
-@router.get("", response_model=List[UsuarioResponse], dependencies=[Depends(require_roles(["admin"]))])
-def listar_usuarios(db: Session = Depends(get_db)):
+@router.get("", response_model=List[UsuarioResponse])
+def listar_usuarios(
+    db: Session = Depends(get_db),
+    admin_user: Usuario = Depends(require_roles(["admin"]))
+):
+    # Restrição RBAC: Exclusivo para perfil 'admin'
     return db.query(Usuario).all()
