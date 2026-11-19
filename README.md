@@ -1,6 +1,6 @@
 # BJJEventOS — API REST para Gerenciamento de Campeonatos de Jiu-Jitsu
 
-Plataforma RESTful especializada na gestão de torneios de Jiu-Jitsu (padrão IBJJF/CBJJ), desenvolvida por **Maria Luiza** em **Python 3.15**, **FastAPI**, **SQLAlchemy** e **PostgreSQL / SQLite**.
+Plataforma RESTful especializada na gestão de campeonatos de Jiu-Jitsu (padrão IBJJF/CBJJ), desenvolvida por **Maria Luiza** em **Python 3.15**, **FastAPI**, **SQLAlchemy** e **PostgreSQL / SQLite**.
 
 ---
 
@@ -15,12 +15,12 @@ Plataforma RESTful especializada na gestão de torneios de Jiu-Jitsu (padrão IB
 ## ✨ Funcionalidades
 
 - Cadastro e autenticação de usuários com JWT
+- Controle de acesso por perfil (Admin, Organizador, Atleta)
 - Cadastro de atletas com faixa, peso, idade e academia
 - Criação e gerenciamento de eventos e categorias
 - Inscrição de atletas por categoria (Peso e Absoluto)
 - Geração de chaves de lutas
 - Lançamento de placares e resultados
-- Controle de acesso por perfil (Admin, Organizador, Atleta)
 
 ---
 
