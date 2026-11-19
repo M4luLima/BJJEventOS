@@ -22,16 +22,22 @@ def get_current_user(
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Token de autenticação inválido",
+                headers={"WWW-Authenticate": "Bearer"},
             )
     except (jwt.PyJWTError, ValidationError):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Não foi possível validar as credenciais",
+            detail="Não foi possível validar as credenciais de autenticação",
+            headers={"WWW-Authenticate": "Bearer"},
         )
     
     user = db.query(Usuario).filter(Usuario.id == int(user_id)).first()
     if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Usuário não encontrado")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Usuário do token não foi encontrado no sistema",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
     return user
 
 def require_roles(allowed_roles: List[str]):
@@ -39,7 +45,7 @@ def require_roles(allowed_roles: List[str]):
         if current_user.perfil not in allowed_roles:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Acesso negado: perfil sem permissão suficiente",
+                detail=f"Acesso negado: Operação restrita aos perfis {allowed_roles}. Seu perfil é '{current_user.perfil}'.",
             )
         return current_user
     return role_checker
