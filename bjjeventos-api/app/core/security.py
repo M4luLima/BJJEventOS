@@ -4,7 +4,7 @@ from typing import Optional, Any
 import jwt
 from app.core.config import settings
 
-SALT = b"bjjeventos_static_salt_for_pbkdf2"
+SALT = b"bjjeventos_static_salt_pbkdf2_2026"
 
 def get_password_hash(password: str) -> str:
     key = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), SALT, 100000)
